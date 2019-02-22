@@ -109,6 +109,10 @@ export interface CalendarWeekViewBeforeRenderEvent extends WeekView {
             dragOverClass="cal-drag-over"
             (drop)="eventDropped($event, day.date, true)"
           ></div>
+          <div
+            class="cal-time-label-column"
+            [ngTemplateOutlet]="allDayEventsLabelTemplate"
+          ></div>
         </div>
         <div
           *ngFor="let eventRow of view.allDayEventRows; trackBy: trackByIndex"
@@ -194,6 +198,13 @@ export interface CalendarWeekViewBeforeRenderEvent extends WeekView {
         (dragEnter)="eventDragEnter = eventDragEnter + 1"
         (dragLeave)="eventDragEnter = eventDragEnter - 1"
       >
+        <div
+          class="currentTimeLine currentTimeString"
+          [style.height.%]="getCurrentTimeHeight()"
+          [style.paddingTop.%]="getCurrentStringHeight()"
+        >
+          {{ getCurrentTimeString() | date: 'medium' }}
+        </div>
         <div class="cal-time-label-column" *ngIf="view.hourColumns.length > 0">
           <div
             *ngFor="
@@ -342,6 +353,28 @@ export interface CalendarWeekViewBeforeRenderEvent extends WeekView {
               >
               </mwl-calendar-week-view-hour-segment>
             </div>
+          </div>
+        </div>
+        <div class="cal-time-label-column" *ngIf="view.hourColumns.length > 0">
+          <div
+            *ngFor="
+              let hour of view.hourColumns[0].hours;
+              trackBy: trackByHour;
+              let odd = odd
+            "
+            class="cal-hour"
+            [class.cal-hour-odd]="odd"
+          >
+            <mwl-calendar-week-view-hour-segment
+              *ngFor="let segment of hour.segments; trackBy: trackByHourSegment"
+              [style.height.px]="hourSegmentHeight"
+              [segment]="segment"
+              [segmentHeight]="hourSegmentHeight"
+              [locale]="locale"
+              [customTemplate]="hourSegmentTemplate"
+              [isTimeLabel]="true"
+            >
+            </mwl-calendar-week-view-hour-segment>
           </div>
         </div>
       </div>
@@ -690,6 +723,26 @@ export class CalendarWeekViewComponent implements OnChanges, OnInit, OnDestroy {
     this.validateResize = ({ rectangle }) =>
       resizeHelper.validateResize({ rectangle });
     this.cdr.markForCheck();
+  }
+
+  public getCurrentTimeHeight() {
+    const currentTimeHours = new Date().getHours();
+    const currentTimeMins = new Date().getMinutes();
+    const currentTimeHourFrac = (currentTimeHours / 24) * 100;
+    const currentTimeMinFrac = (currentTimeMins / 60) * (1 / 24) * 100;
+    return `${currentTimeHourFrac + currentTimeMinFrac}`;
+  }
+
+  public getCurrentStringHeight() {
+    const currentTimeHours = new Date().getHours();
+    const currentTimeMins = new Date().getMinutes();
+    const currentTimeHourFrac = (currentTimeHours / 24) * 100;
+    const currentTimeMinFrac = (currentTimeMins / 60) * (1 / 24) * 100;
+    return `${(currentTimeHourFrac + currentTimeMinFrac) * 2}`;
+  }
+
+  public getCurrentTimeString() {
+    return new Date();
   }
 
   /**

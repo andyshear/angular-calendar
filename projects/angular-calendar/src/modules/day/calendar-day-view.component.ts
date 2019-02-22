@@ -114,6 +114,13 @@ export interface DayViewEventResize {
       >
         <div class="cal-events">
           <div
+            class="currentTimeLine currentTimeString"
+            [style.height.%]="getCurrentTimeHeight()"
+            [style.paddingTop.%]="getCurrentStringHeight()"
+          >
+            {{ getCurrentTimeString() | date: 'medium' }}
+          </div>
+          <div
             #event
             *ngFor="let dayEvent of view?.events; trackBy: trackByDayEvent"
             class="cal-event-container"
@@ -470,6 +477,26 @@ export class CalendarDayViewComponent implements OnChanges, OnInit, OnDestroy {
     ) {
       this.refreshView();
     }
+  }
+
+  public getCurrentTimeHeight() {
+    const currentTimeHours = new Date().getHours();
+    const currentTimeMins = new Date().getMinutes();
+    const currentTimeHourFrac = (currentTimeHours / 24) * 100;
+    const currentTimeMinFrac = (currentTimeMins / 60) * (1 / 24) * 100;
+    return `${currentTimeHourFrac + currentTimeMinFrac}`;
+  }
+
+  public getCurrentStringHeight() {
+    const currentTimeHours = new Date().getHours();
+    const currentTimeMins = new Date().getMinutes();
+    const currentTimeHourFrac = (currentTimeHours / 24) * 100;
+    const currentTimeMinFrac = (currentTimeMins / 60) * (1 / 24) * 100;
+    return `${(currentTimeHourFrac + currentTimeMinFrac) * 2}`;
+  }
+
+  public getCurrentTimeString() {
+    return new Date();
   }
 
   eventDropped(
