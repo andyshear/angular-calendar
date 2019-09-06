@@ -112,12 +112,14 @@
     height: 0%;
     border-bottom: 2px solid red;
     position: absolute;
-    z-index: 999;
+    z-index: 0;
   }
 
   .currentTimeString {
     padding-top: 0%;
     font-size: 0.75em;
     color: red;
+    position: absolute;
+    z-index: 0;
   }
 }

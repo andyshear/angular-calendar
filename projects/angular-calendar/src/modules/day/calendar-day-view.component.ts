@@ -113,11 +113,8 @@ export interface DayViewEventResize {
         (dragLeave)="eventDragEnter = eventDragEnter - 1"
       >
         <div class="cal-events">
-          <div
-            class="currentTimeLine currentTimeString"
-            [style.height.%]="currentTimeHeight"
-            [style.paddingTop.%]="currentStringHeight"
-          >
+          <div class="currentTimeLine" [style.top.%]="currentTimeHeight"></div>
+          <div class="currentTimeString" [style.top.%]="currentStringHeight">
             {{ currentTimeString | date: 'medium' }}
           </div>
           <div
@@ -417,6 +414,7 @@ export class CalendarDayViewComponent implements OnChanges, OnInit, OnDestroy {
   public currentTimeHeight = '0';
   public currentStringHeight = '0';
   public currentTimeString = new Date();
+  private timeout: any;
 
   /**
    * @hidden
@@ -434,6 +432,7 @@ export class CalendarDayViewComponent implements OnChanges, OnInit, OnDestroy {
    * @hidden
    */
   ngOnInit(): void {
+    this.startCurrentTimeUpdate();
     if (this.refresh) {
       this.refreshSubscription = this.refresh.subscribe(() => {
         this.refreshAll();
@@ -442,10 +441,20 @@ export class CalendarDayViewComponent implements OnChanges, OnInit, OnDestroy {
     }
   }
 
+  startCurrentTimeUpdate() {
+    this.getCurrentTimeHeight();
+    this.getCurrentStringHeight();
+    this.getCurrentTimeString();
+    this.timeout = setTimeout(time => {
+      this.startCurrentTimeUpdate();
+    }, 30000);
+  }
+
   /**
    * @hidden
    */
   ngOnDestroy(): void {
+    clearTimeout(this.timeout);
     if (this.refreshSubscription) {
       this.refreshSubscription.unsubscribe();
     }
@@ -496,8 +505,7 @@ export class CalendarDayViewComponent implements OnChanges, OnInit, OnDestroy {
     const currentTimeMins = new Date().getMinutes();
     const currentTimeHourFrac = (currentTimeHours / 24) * 100;
     const currentTimeMinFrac = (currentTimeMins / 60) * (1 / 24) * 100;
-    this.currentStringHeight = `${(currentTimeHourFrac + currentTimeMinFrac) *
-      2}`;
+    this.currentStringHeight = `${currentTimeHourFrac + currentTimeMinFrac}`;
   }
 
   public getCurrentTimeString() {
